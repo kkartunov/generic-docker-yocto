@@ -37,9 +37,10 @@ RUN echo $USER" ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
 
 # Get dependencies
 WORKDIR /home/$USER
-RUN wget http://git.yoctoproject.org/cgit/cgit.cgi/poky/snapshot/poky-$POKY_BRANCH.zip && unzip poky-$POKY_BRANCH.zip && mv poky-$POKY_BRANCH $POKY_PATH && rm poky-$POKY_BRANCH.zip
-RUN wget http://git.openembedded.org/meta-openembedded/snapshot/meta-openembedded-$OPENEMBEDDED_BRANCH.zip && unzip meta-openembedded-$OPENEMBEDDED_BRANCH.zip && mv meta-openembedded-$OPENEMBEDDED_BRANCH $POKY_PATH && rm meta-openembedded-$OPENEMBEDDED_BRANCH.zip
-
+# RUN wget http://git.yoctoproject.org/cgit/cgit.cgi/poky/snapshot/poky-$POKY_BRANCH.zip && unzip poky-$POKY_BRANCH.zip && mv poky-$POKY_BRANCH $POKY_PATH && rm poky-$POKY_BRANCH.zip
+RUN git clone --depth=1 git://git.yoctoproject.org/poky -b morty $POKY_PATH
+# RUN wget http://git.openembedded.org/meta-openembedded/snapshot/meta-openembedded-$OPENEMBEDDED_BRANCH.zip && unzip meta-openembedded-$OPENEMBEDDED_BRANCH.zip && mv meta-openembedded-$OPENEMBEDDED_BRANCH $POKY_PATH && rm meta-openembedded-$OPENEMBEDDED_BRANCH.zip
+RUN git clone --depth=1 https://github.com/openembedded/meta-openembedded.git -b morty $POKY_PATH/meta-openembedded
 # Copy host's build and layers folders to container
 COPY $HOST_CONF_PATH $BUILD_PATH/conf
 COPY $HOST_LAYERS_PATH $BBLAYERS_PATH
@@ -48,6 +49,6 @@ RUN chmod -R 777 $BUILD_PATH
 # Run the build
 USER $USER
 ARG BITBAKE_TARGET
-RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && MACHINE=beaglebone bitbake $BITBAKE_TARGET"
+RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && MACHINE=beaglebone bitbake -k $BITBAKE_TARGET"
 
 # EOF
