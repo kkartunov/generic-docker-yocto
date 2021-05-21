@@ -8,15 +8,16 @@ ARG BUILD_PATH=/home/$USER/build
 ARG HOST_CONF_PATH=build/conf
 ARG HOST_LAYERS_PATH=layers
 
-# Set the locale
-RUN locale-gen en_US.UTF-8
-ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8' POKY_PATH=/home/$USER/poky BBLAYERS_PATH=/home/$USER/bblayers
-
 # Intended command for the image
 CMD "/bin/bash"
 
 # Update
 RUN apt-get update && apt-get -y upgrade
+
+# Set the locale
+RUN apt-get install -y locales
+RUN locale-gen en_US.UTF-8
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8' POKY_PATH=/home/$USER/poky BBLAYERS_PATH=/home/$USER/bblayers
 
 # Install utilities
 RUN apt-get install -y build-essential unzip cpio checkinstall chrpath diffstat gawk git wget libncurses5-dev pkg-config subversion texi2html texinfo python2.7 libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
@@ -47,6 +48,6 @@ RUN chmod -R 777 $BUILD_PATH
 # Run the build
 USER $USER
 ARG BITBAKE_TARGET
-RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && bitbake $BITBAKE_TARGET"
+RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && MACHINE=beaglebone bitbake $BITBAKE_TARGET"
 
 # EOF
