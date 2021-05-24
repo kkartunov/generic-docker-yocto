@@ -24,12 +24,13 @@ RUN apt-get install -y build-essential unzip cpio checkinstall chrpath diffstat 
 
 # Link python 2.7 package as 'python' that the Yocto 2.2 branch requires
 RUN ln -sf /usr/bin/python2.7 /usr/bin/python
+RUN apt-get install -y python-software-properties software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa && apt update
+RUN apt install -y python3.6
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 3
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2.7 2
 
-# Install and link python 3 as BitBake requires Python 3.4.0 or later as 'python3'
-WORKDIR /usr/src
-RUN wget https://www.python.org/ftp/python/3.4.5/Python-3.4.5.tgz && tar xzf Python-3.4.5.tgz
-RUN cd Python-3.4.5 && ./configure && make altinstall
-RUN ln -sf /usr/local/bin/python3.4 /usr/bin/python3
+RUN apt install -y vim
 
 # Create a non-root user that will perform the actual build
 RUN id build 2>/dev/null || useradd --uid 30000 --create-home $USER
@@ -46,9 +47,13 @@ COPY $HOST_CONF_PATH $BUILD_PATH/conf
 COPY $HOST_LAYERS_PATH $BBLAYERS_PATH
 RUN chmod -R 777 $BUILD_PATH
 
+RUN echo "export LANG='en_US.UTF-8'" >> /home/$USER/.bashrc
+RUN echo "export LANGUAGE='en_US:en'" >> /home/$USER/.bashrc
+RUN echo "export LC_ALL='en_US.UTF-8'" >> /home/$USER/.bashrc
+
 # Run the build
 USER $USER
 ARG BITBAKE_TARGET
-RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && MACHINE=beaglebone bitbake -k $BITBAKE_TARGET"
+RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && MACHINE=beaglebone bitbake $BITBAKE_TARGET"
 
 # EOF
