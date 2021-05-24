@@ -53,7 +53,7 @@ RUN echo "export LC_ALL='en_US.UTF-8'" >> /home/$USER/.bashrc
 
 # Run the build
 USER $USER
-ARG BITBAKE_TARGET
+ARG BITBAKE_TARGET=core-image-sato
 RUN /bin/bash -c "source $POKY_PATH/oe-init-build-env $BUILD_PATH && MACHINE=beaglebone bitbake $BITBAKE_TARGET"
 
 # EOF
