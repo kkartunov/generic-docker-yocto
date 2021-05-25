@@ -1,9 +1,7 @@
 pipeline {
     agent { 
         dockerfile true
-        node {
-            label 'Threadripper'
-        }
+        label 'Threadripper'
     }
     stages {
         stage('Test') {
