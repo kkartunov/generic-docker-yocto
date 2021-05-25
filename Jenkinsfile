@@ -1,5 +1,10 @@
 pipeline {
-    agent { dockerfile true }
+    agent { 
+        dockerfile true
+        node {
+            label 'Threadripper'
+        }
+    }
     stages {
         stage('Test') {
             steps {
