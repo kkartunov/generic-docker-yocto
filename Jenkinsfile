@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                docker build --build-arg BITBAKE_TARGET=core-image-minimal -t yocto/core-image-minimal .
+                sh 'docker build --build-arg BITBAKE_TARGET=core-image-minimal -t yocto/core-image-minimal .'
             }
         }
     }
